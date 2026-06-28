@@ -8,6 +8,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/unimaintain_test
+      JWT_SECRET: test-jwt-secret-for-ci
+      CLOUDINARY_CLOUD_NAME: test
+      CLOUDINARY_API_KEY: test
+      CLOUDINARY_API_SECRET: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,8 +21,6 @@ jobs:
           node-version: '22'
       - run: npm install
       - run: npm --workspace backend exec prisma generate
-        env:
-          DATABASE_URL: postgresql://user:pass@localhost:5432/db
       - run: npm run test:backend
       - run: npm run test:frontend
 
