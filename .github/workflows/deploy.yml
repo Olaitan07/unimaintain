@@ -65,15 +65,14 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          port: ${{ secrets.SSH_PORT }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd ${{ secrets.REMOTE_PATH }}
-            docker compose pull
-            docker compose up -d
+      - name: Trigger Render staging deploy
+        if: github.ref == 'refs/heads/staging'
+        run: |
+          curl -s "${{ secrets.RENDER_BACKEND_STAGING_HOOK }}"
+          curl -s "${{ secrets.RENDER_FRONTEND_STAGING_HOOK }}"
+
+      - name: Trigger Render production deploy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          curl -s "${{ secrets.RENDER_BACKEND_PROD_HOOK }}"
+          curl -s "${{ secrets.RENDER_FRONTEND_PROD_HOOK }}"
