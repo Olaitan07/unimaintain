@@ -14,6 +14,9 @@ jobs:
         with:
           node-version: '22'
       - run: npm install
+      - run: npm --workspace backend exec prisma generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
       - run: npm run test:backend
       - run: npm run test:frontend
 

@@ -8,10 +8,8 @@ const config: Config.InitialOptions = {
   roots: ['<rootDir>/src'],
   setupFiles: ['<rootDir>/jest.setup.ts'],
   testPathIgnorePatterns: ['/dist/', '/node_modules/'],
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
   }
 };
 
