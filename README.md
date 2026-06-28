@@ -21,15 +21,55 @@ A full-stack university maintenance request system scaffolded as a monorepo.
 
 ## Getting started
 
-1. Copy `.env.example` to `.env` and fill the values.
-2. Run `npm install` from the root.
-3. Start development:
-   - `npm run dev:frontend`
-   - `npm run dev:backend`
+1. Copy `.env.example` to `.env` and fill in your values.
+2. Run `npm install` from the project root.
+3. Start the full stack:
+   - `docker compose up --build -d`
+4. Apply database migrations:
+   - `docker compose exec backend npx prisma migrate deploy`
+5. Seed the database:
+   - `docker compose exec backend npx prisma db seed`
 
 ## Docker
 
-- `docker compose up --build`
+This repo includes production-ready Docker setup:
+
+- `/frontend/Dockerfile` — multi-stage build, nginx SPA routing
+- `/backend/Dockerfile` — Node.js app with Prisma migrate deploy at startup
+- `docker-compose.yml` — local development stack with Postgres, backend, frontend, and pgAdmin
+- `docker-compose.prod.yml` — production override without pgAdmin, restart policies, and resource limits
+
+### Run locally
+
+```bash
+docker compose up --build -d
+```
+
+### Production deploy
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+## Environment variables
+
+Copy `.env.example` to `.env` and update these values:
+
+- `DATABASE_URL` — PostgreSQL connection string
+- `JWT_SECRET` — JWT signing secret
+- `CLOUDINARY_URL` — Cloudinary connection string
+- `PORT` — backend port (default `4000`)
+- `FRONTEND_URL` — public frontend URL
+- `NODE_ENV` — `development` or `production`
+
+## GitHub Actions Deployment
+
+A workflow is included at `.github/workflows/deploy.yml` that:
+
+1. Runs backend and frontend tests
+2. Builds Docker images
+3. Pushes them to Docker Hub
+4. SSH deploys to a remote VPS using `docker compose pull` and `docker compose up -d`
 
 ## Helper commands
 
@@ -37,13 +77,8 @@ From the repo root:
 
 - `npm run db:up` — start only the PostgreSQL container
 - `npm run db:down` — stop all compose services
-- `npm run db:migrate` — run Prisma migrations inside the backend container
-- `npm run db:seed` — run Prisma seed script inside the backend container
-
-## Notes
-
-This scaffold includes project structure and configuration only. Application logic is not implemented yet.
-
+- `npm run db:migrate` — run migrations inside the backend container
+- `npm run db:seed` — seed the database inside the backend container
 
 # 🏫 UniMaintain
 
