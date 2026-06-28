@@ -23,7 +23,7 @@ export function RegisterPage() {
       toast.success('Account created successfully');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Registration failed');
+      toast.error(error.response?.data?.error?.message || 'Registration failed');
     }
   };
 

@@ -1,35 +1,45 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-let cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-let apiKey = process.env.CLOUDINARY_API_KEY;
-let apiSecret = process.env.CLOUDINARY_API_SECRET;
+function isPlaceholder(value: string | undefined) {
+  return !value || value.startsWith('your_');
+}
 
-const cloudinaryUrl = process.env.CLOUDINARY_URL;
-if (cloudinaryUrl) {
-  try {
-    const url = new URL(cloudinaryUrl);
-    if (url.protocol !== 'cloudinary:') {
-      throw new Error('CLOUDINARY_URL must use the cloudinary:// protocol');
+function resolveConfig() {
+  let cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  let apiKey = process.env.CLOUDINARY_API_KEY;
+  let apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  const cloudinaryUrl = process.env.CLOUDINARY_URL;
+  if (cloudinaryUrl) {
+    try {
+      const url = new URL(cloudinaryUrl);
+      if (url.protocol !== 'cloudinary:') throw new Error('CLOUDINARY_URL must use the cloudinary:// protocol');
+      cloudName = url.hostname;
+      apiKey = url.username;
+      apiSecret = url.password;
+    } catch {
+      return null;
     }
-    cloudName = url.hostname;
-    apiKey = url.username;
-    apiSecret = url.password;
-  } catch (error) {
-    throw new Error('Invalid CLOUDINARY_URL format');
   }
+
+  if (isPlaceholder(cloudName) || isPlaceholder(apiKey) || isPlaceholder(apiSecret)) {
+    return null;
+  }
+
+  return { cloudName: cloudName!, apiKey: apiKey!, apiSecret: apiSecret! };
 }
 
-if (!cloudName || !apiKey || !apiSecret) {
-  throw new Error('Cloudinary environment variables must be defined');
+const config = resolveConfig();
+if (config) {
+  cloudinary.config({ cloud_name: config.cloudName, api_key: config.apiKey, api_secret: config.apiSecret });
 }
 
-cloudinary.config({
-  cloud_name: cloudName,
-  api_key: apiKey,
-  api_secret: apiSecret
-});
+export const cloudinaryConfigured = config !== null;
 
 export async function uploadImage(buffer: Buffer): Promise<string> {
+  if (!cloudinaryConfigured) {
+    throw new Error('Cloudinary is not configured');
+  }
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream({ folder: 'unimaintain' }, (error, result) => {
       if (error || !result) {

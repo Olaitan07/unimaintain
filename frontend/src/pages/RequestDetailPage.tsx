@@ -32,7 +32,7 @@ export function RequestDetailPage() {
       setNewStatus('');
       setComment('');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to update status');
+      toast.error(error.response?.data?.error?.message || 'Failed to update status');
     }
   };
 
@@ -47,7 +47,7 @@ export function RequestDetailPage() {
       toast.success('Officer assigned');
       setSelectedOfficer('');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to assign officer');
+      toast.error(error.response?.data?.error?.message || 'Failed to assign officer');
     }
   };
 

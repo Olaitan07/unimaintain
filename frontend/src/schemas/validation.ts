@@ -14,7 +14,7 @@ export const registerSchema = z.object({
 export const createRequestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
-  categoryId: z.string().cuid('Category is required'),
+  categoryId: z.string().min(1, 'Category is required'),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).default('MEDIUM'),
   location: z.string().min(1, 'Location is required')
 });

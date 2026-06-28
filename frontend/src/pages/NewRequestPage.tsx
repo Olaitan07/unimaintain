@@ -3,26 +3,18 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useCreateRequest, useRequests } from '../hooks/useApi';
+import { useCreateRequest, useCategories } from '../hooks/useApi';
 import { createRequestSchema, CreateRequestInput } from '../schemas/validation';
 
-const CATEGORIES = [
-  { id: '1', name: 'Electrical' },
-  { id: '2', name: 'Plumbing' },
-  { id: '3', name: 'Cleaning' },
-  { id: '4', name: 'Heating' },
-  { id: '5', name: 'Furniture' }
-];
-
 export function NewRequestPage() {
-  const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm<CreateRequestInput>({
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CreateRequestInput>({
     resolver: zodResolver(createRequestSchema)
   });
 
   const navigate = useNavigate();
   const createMutation = useCreateRequest();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const file = watch('title') ? true : false;
 
   const onSubmit = async (data: CreateRequestInput) => {
     try {
@@ -42,7 +34,7 @@ export function NewRequestPage() {
       toast.success('Request created successfully');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to create request');
+      toast.error(error.response?.data?.error?.message || 'Failed to create request');
     }
   };
 
@@ -78,10 +70,11 @@ export function NewRequestPage() {
             <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
             <select
               {...register('categoryId')}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={categoriesLoading}
+              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
               <option value="">Select a category</option>
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
