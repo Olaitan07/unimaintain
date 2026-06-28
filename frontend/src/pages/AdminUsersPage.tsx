@@ -15,7 +15,7 @@ export function AdminUsersPage() {
       setSelectedRoles((prev) => ({ ...prev, [userId]: newRole }));
       toast.success('User role updated');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to update role');
+      toast.error(error.response?.data?.error?.message || 'Failed to update role');
     }
   };
 

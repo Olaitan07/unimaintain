@@ -12,8 +12,8 @@ export const requestListSchema = z.object({
   search: z.string().optional(),
   status: z.enum(['PENDING', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED']).optional(),
   categoryId: z.string().cuid('Category ID must be a valid cuid').optional(),
-  page: z.preprocess((value) => Number(value), z.number().int().positive().default(1)),
-  limit: z.preprocess((value) => Number(value), z.number().int().positive().max(100).default(20))
+  page: z.preprocess((value) => (value !== undefined ? Number(value) : undefined), z.number().int().positive().default(1)),
+  limit: z.preprocess((value) => (value !== undefined ? Number(value) : undefined), z.number().int().positive().max(100).default(20))
 });
 
 export const updateStatusSchema = z.object({

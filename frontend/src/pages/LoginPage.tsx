@@ -23,7 +23,7 @@ export function LoginPage() {
       toast.success('Logged in successfully');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Login failed');
+      toast.error(error.response?.data?.error?.message || 'Login failed');
     }
   };
 

@@ -12,6 +12,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { NewRequestPage } from './pages/NewRequestPage';
 import { RequestDetailPage } from './pages/RequestDetailPage';
 import { AdminUsersPage } from './pages/AdminUsersPage';
+import { RequestsPage } from './pages/RequestsPage';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <RequestDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/requests"
+                element={
+                  <ProtectedRoute roles={['ADMIN', 'OFFICER']}>
+                    <RequestsPage />
                   </ProtectedRoute>
                 }
               />

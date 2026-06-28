@@ -32,6 +32,18 @@ export function useMe() {
   });
 }
 
+// Categories API
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await axiosInstance.get('/categories');
+      return response.data.data as { id: string; name: string }[];
+    },
+    staleTime: 1000 * 60 * 10
+  });
+}
+
 // Requests API
 export function useRequests(filters?: { search?: string; status?: string; categoryId?: string; page?: number; limit?: number }) {
   return useQuery({
@@ -134,12 +146,13 @@ export function useAssignOfficer() {
   });
 }
 
-export function useReports() {
+export function useReports(enabled = true) {
   return useQuery({
     queryKey: ['admin', 'reports'],
     queryFn: async () => {
       const response = await axiosInstance.get('/admin/reports');
       return response.data.data;
-    }
+    },
+    enabled
   });
 }

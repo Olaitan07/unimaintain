@@ -33,6 +33,8 @@ router.get('/', validateQuery(requestListSchema), async (req, res, next) => {
 
     if (user?.role === 'STUDENT') {
       filters.createdById = user.id;
+    } else if (user?.role === 'OFFICER') {
+      filters.assignedToId = user.id;
     }
 
     const total = await prisma.serviceRequest.count({ where: filters });
@@ -64,7 +66,11 @@ router.post('/', upload.single('image'), validateBody(createRequestSchema), asyn
   try {
     let imageUrl: string | undefined;
     if (req.file) {
-      imageUrl = await uploadImage(req.file.buffer);
+      try {
+        imageUrl = await uploadImage(req.file.buffer);
+      } catch {
+        // image upload is optional — proceed without it
+      }
     }
 
     const request = await prisma.serviceRequest.create({
