@@ -7,6 +7,7 @@ const config: Config.InitialOptions = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   roots: ['<rootDir>/src'],
   setupFiles: ['<rootDir>/jest.setup.ts'],
+  testTimeout: 20000,
   testPathIgnorePatterns: ['/dist/', '/node_modules/'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }]
