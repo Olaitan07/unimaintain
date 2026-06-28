@@ -1,0 +1,58 @@
+{
+  "info": {
+    "name": "UniMaintain API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}" }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}" }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Requests",
+      "item": [
+        { "name": "List Requests", "request": { "method": "GET", "url": "{{baseUrl}}/api/requests" } },
+        { "name": "Create Request", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/requests" } },
+        { "name": "Get Request", "request": { "method": "GET", "url": "{{baseUrl}}/api/requests/:id" } },
+        { "name": "Update Request", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/requests/:id" } },
+        { "name": "Delete Request", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/requests/:id" } }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        { "name": "List Users", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/admin/users" } },
+        { "name": "Update User Role", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/admin/users/:id" } },
+        { "name": "Assign Officer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/admin/requests/:id/assign" } }
+      ]
+    }
+  ],
+  "event": []
+}

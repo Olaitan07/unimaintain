@@ -1,0 +1,22 @@
+{
+  "name": "unimaintain",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm --workspace frontend dev",
+    "build:frontend": "npm --workspace frontend build",
+    "preview:frontend": "npm --workspace frontend preview",
+    "dev:backend": "npm --workspace backend dev",
+    "build:backend": "npm --workspace backend build",
+    "start:backend": "npm --workspace backend start",
+    "test:frontend": "npm --workspace frontend test",
+    "test:backend": "npm --workspace backend test",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "docker compose run --rm backend npm run prisma:migrate",
+    "db:seed": "docker compose run --rm backend npm run prisma:seed"
+  }
+}
