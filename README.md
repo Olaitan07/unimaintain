@@ -335,17 +335,13 @@ The GitHub Actions workflow (`.github/workflows/deploy.yml`) runs automatically 
 
 ---
 
-## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
----
 
 ## 👤 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@university.edu
+- GitHub: Olaitan07
+- Email: l.olabanjo5055@miva.edu.ng
 
 ---
 
