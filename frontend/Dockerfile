@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-COPY frontend/package.json frontend/package-lock.json ./
+COPY frontend/package*.json ./
 COPY frontend/tsconfig.json frontend/vite.config.ts frontend/postcss.config.js ./
 
 RUN npm install
