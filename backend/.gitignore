@@ -1,5 +1,5 @@
 node_modules/
 dist/
 .env
-prisma/migrations/
+# prisma/migrations/ — do not ignore, needed for production deploys
 coverage/
