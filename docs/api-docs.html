@@ -1,0 +1,692 @@
+<title>UniMaintain API Documentation</title>
+<meta name="description" content="Complete REST API documentation for UniMaintain — a university maintenance request management system.">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:#f3f4f6;color:#1f2937;display:flex;min-height:100vh}
+
+  /* Sidebar */
+  .sidebar{width:260px;min-width:260px;background:#1f2937;color:#f9fafb;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-brand{padding:20px 16px 14px;border-bottom:1px solid #374151}
+  .sidebar-brand h1{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+  .sidebar-brand p{font-size:11px;color:#9ca3af}
+  .sidebar-section{padding:12px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280}
+  .sidebar-link{display:flex;align-items:center;gap:8px;padding:6px 16px;font-size:12.5px;color:#d1d5db;cursor:pointer;text-decoration:none;border-left:3px solid transparent}
+  .sidebar-link:hover{background:#374151;color:#fff;border-left-color:#6b7280}
+  .sidebar-link.active{background:#374151;color:#fff;border-left-color:#f97316}
+  .method-badge{font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;flex-shrink:0;min-width:36px;text-align:center;letter-spacing:.03em}
+  .get  {background:#dcfce7;color:#166534}
+  .post {background:#dbeafe;color:#1e40af}
+  .patch{background:#fef3c7;color:#92400e}
+  .del  {background:#fee2e2;color:#991b1b}
+
+  /* Main */
+  .main{flex:1;overflow-y:auto;padding:32px}
+  .page-title{margin-bottom:32px}
+  .page-title h2{font-size:26px;font-weight:700;color:#111827;margin-bottom:6px}
+  .page-title p{color:#6b7280;font-size:14px;line-height:1.6;max-width:640px}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0 32px}
+  .info-card{background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:14px 16px}
+  .info-card label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;display:block;margin-bottom:4px}
+  .info-card span{font-size:13px;color:#111827;word-break:break-all}
+  .info-card a{color:#f97316;text-decoration:none}
+  .info-card a:hover{text-decoration:underline}
+
+  /* Endpoint cards */
+  .endpoint{background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:20px;overflow:hidden}
+  .endpoint-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #e5e7eb;cursor:pointer;user-select:none}
+  .endpoint-header:hover{background:#f9fafb}
+  .endpoint-title{font-size:14px;font-weight:600;color:#111827;flex:1}
+  .endpoint-path{font-size:12px;font-family:'Courier New',monospace;color:#6b7280;margin-left:auto}
+  .endpoint-body{padding:20px}
+  .endpoint-desc{color:#4b5563;font-size:13px;line-height:1.6;margin-bottom:16px}
+  .chevron{color:#9ca3af;font-size:12px;transition:transform .2s}
+  .open .chevron{transform:rotate(180deg)}
+
+  /* Section label */
+  .section-group{margin-bottom:32px}
+  .group-title{font-size:18px;font-weight:700;color:#111827;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #e5e7eb;display:flex;align-items:center;gap:8px}
+  .group-title span{font-size:12px;font-weight:500;color:#6b7280;font-family:'Courier New',monospace}
+
+  /* Tabs */
+  .tabs{display:flex;gap:0;border-bottom:1px solid #e5e7eb;margin-bottom:16px}
+  .tab{padding:8px 16px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:#f97316;border-bottom-color:#f97316}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* Params / body table */
+  .param-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px}
+  .param-table th{background:#f9fafb;padding:8px 12px;text-align:left;font-weight:600;color:#374151;border:1px solid #e5e7eb;font-size:11px}
+  .param-table td{padding:8px 12px;border:1px solid #e5e7eb;vertical-align:top;color:#374151}
+  .param-table td:first-child{font-family:'Courier New',monospace;color:#1e40af;white-space:nowrap}
+  .required{color:#dc2626;font-size:10px;font-weight:700;margin-left:4px}
+  .optional{color:#9ca3af;font-size:10px;margin-left:4px}
+
+  /* Code blocks */
+  pre{background:#1e1e1e;color:#d4d4d4;padding:14px 16px;border-radius:6px;font-family:'Courier New',monospace;font-size:11.5px;line-height:1.6;overflow-x:auto;white-space:pre}
+  .code-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-bottom:6px}
+
+  /* Response chips */
+  .response-chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:8px}
+  .r200{background:#dcfce7;color:#166534}
+  .r201{background:#dbeafe;color:#1e40af}
+  .r400{background:#fef3c7;color:#92400e}
+  .r401{background:#fee2e2;color:#991b1b}
+  .r403{background:#fce7f3;color:#9d174d}
+
+  /* Auth note */
+  .auth-note{background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:16px}
+
+  /* Credentials */
+  .cred-table{width:100%;border-collapse:collapse;font-size:12px}
+  .cred-table th{background:#1f2937;color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600}
+  .cred-table td{padding:8px 12px;border:1px solid #e5e7eb;font-family:'Courier New',monospace;font-size:12px}
+  .cred-table tr:nth-child(even) td{background:#f9fafb}
+
+  @media(max-width:700px){
+    body{flex-direction:column}
+    .sidebar{width:100%;height:auto;position:relative}
+    .main{padding:16px}
+  }
+</style>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <h1>UniMaintain API</h1>
+    <p>v1.0 · REST · JSON</p>
+  </div>
+  <div class="sidebar-section">Overview</div>
+  <a class="sidebar-link active" href="#overview">Introduction</a>
+  <a class="sidebar-link" href="#auth-section">Authentication</a>
+  <div class="sidebar-section">Endpoints</div>
+  <a class="sidebar-link" href="#health"><span class="method-badge get">GET</span> Health Check</a>
+  <a class="sidebar-link" href="#register"><span class="method-badge post">POST</span> Register</a>
+  <a class="sidebar-link" href="#login"><span class="method-badge post">POST</span> Login</a>
+  <a class="sidebar-link" href="#me"><span class="method-badge get">GET</span> Get Current User</a>
+  <a class="sidebar-link" href="#categories"><span class="method-badge get">GET</span> List Categories</a>
+  <a class="sidebar-link" href="#list-requests"><span class="method-badge get">GET</span> List Requests</a>
+  <a class="sidebar-link" href="#create-request"><span class="method-badge post">POST</span> Create Request</a>
+  <a class="sidebar-link" href="#get-request"><span class="method-badge get">GET</span> Get Request</a>
+  <a class="sidebar-link" href="#update-status"><span class="method-badge patch">PATCH</span> Update Status</a>
+  <a class="sidebar-link" href="#assign"><span class="method-badge post">POST</span> Assign Officer</a>
+  <a class="sidebar-link" href="#officers"><span class="method-badge get">GET</span> List Officers</a>
+  <a class="sidebar-link" href="#reports"><span class="method-badge get">GET</span> Reports</a>
+  <a class="sidebar-link" href="#notifications"><span class="method-badge get">GET</span> Notifications</a>
+  <a class="sidebar-link" href="#mark-read"><span class="method-badge patch">PATCH</span> Mark Read</a>
+</div>
+
+<div class="main">
+
+  <!-- Overview -->
+  <div id="overview" class="page-title">
+    <h2>UniMaintain API</h2>
+    <p>Complete REST API for UniMaintain — a university maintenance request management system. All responses use a consistent envelope format. All protected endpoints require a Bearer JWT token in the Authorization header.</p>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <label>Base URL</label>
+      <span><a href="https://unimaintain.onrender.com" target="_blank">https://unimaintain.onrender.com</a></span>
+    </div>
+    <div class="info-card">
+      <label>Frontend App</label>
+      <span><a href="https://unimaintain-frontend.onrender.com" target="_blank">https://unimaintain-frontend.onrender.com</a></span>
+    </div>
+    <div class="info-card">
+      <label>Protocol</label>
+      <span>HTTPS · REST · JSON</span>
+    </div>
+    <div class="info-card">
+      <label>Auth Method</label>
+      <span>JWT Bearer Token</span>
+    </div>
+  </div>
+
+  <!-- Response format -->
+  <div class="section-group">
+    <div class="group-title">Response Format</div>
+    <div class="endpoint-body" style="background:#fff;border:1px solid #e5e7eb;border-radius:8px">
+      <p class="endpoint-desc">All responses follow a consistent envelope:</p>
+      <div class="code-label">Success</div>
+      <pre>{ "success": true, "data": { ... } }</pre>
+      <br>
+      <div class="code-label">Error</div>
+      <pre>{ "success": false, "error": { "message": "...", "details": null } }</pre>
+    </div>
+  </div>
+
+  <!-- Auth info -->
+  <div id="auth-section" class="section-group">
+    <div class="group-title">Test Credentials</div>
+    <div class="endpoint-body" style="background:#fff;border:1px solid #e5e7eb;border-radius:8px">
+      <p class="endpoint-desc" style="margin-bottom:12px">All seeded accounts share the same password. Use Login to get a JWT token, then include it as <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px">Authorization: Bearer &lt;token&gt;</code> in all protected requests.</p>
+      <table class="cred-table">
+        <thead><tr><th>Role</th><th>Email</th><th>Password</th></tr></thead>
+        <tbody>
+          <tr><td>ADMIN</td><td>alice.admin@unimaintain.edu</td><td>Password123!</td></tr>
+          <tr><td>OFFICER</td><td>olivia.officer@unimaintain.edu</td><td>Password123!</td></tr>
+          <tr><td>STUDENT</td><td>sam.student@unimaintain.edu</td><td>Password123!</td></tr>
+          <tr><td>STAFF</td><td>sarah.staff@unimaintain.edu</td><td>Password123!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HEALTH -->
+  <div class="section-group">
+    <div class="group-title">Health <span>/api/health</span></div>
+    <div id="health" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">Health Check</span>
+        <span class="endpoint-path">/api/health</span>
+      </div>
+      <div class="endpoint-body">
+        <p class="endpoint-desc">Check if the backend server is running. No authentication required.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": {
+    "status": "ok",
+    "service": "unimaintain-backend"
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH -->
+  <div class="section-group">
+    <div class="group-title">Auth <span>/api/auth</span></div>
+
+    <div id="register" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-title">Register</span>
+        <span class="endpoint-path">/api/auth/register</span>
+      </div>
+      <div class="endpoint-body">
+        <p class="endpoint-desc">Register a new user account. New users default to the STUDENT role. Returns a JWT token and user object on success.</p>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'reg')">Body</div>
+          <div class="tab" onclick="switchTab(this,'reg-res')">Response</div>
+        </div>
+        <div class="tab-panel active" data-group="reg">
+          <div class="code-label">Content-Type: application/json</div>
+          <pre>{
+  "name":     "Sam Student",
+  "email":    "sam@example.com",
+  "password": "Password123!"
+}</pre>
+          <table class="param-table" style="margin-top:12px">
+            <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>name</td><td>string</td><td><span class="required">Required</span></td><td>Full name, min 1 character</td></tr>
+              <tr><td>email</td><td>string</td><td><span class="required">Required</span></td><td>Valid email address, must be unique</td></tr>
+              <tr><td>password</td><td>string</td><td><span class="required">Required</span></td><td>Minimum 8 characters</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-panel" data-group="reg-res">
+          <span class="response-chip r201">201 Created</span>
+          <pre>{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id":        "clz1abc123",
+    "name":      "Sam Student",
+    "email":     "sam@example.com",
+    "role":      "STUDENT",
+    "createdAt": "2026-06-29T10:00:00.000Z"
+  }
+}</pre>
+          <span class="response-chip r400">400 Bad Request</span>
+          <pre>{ "success": false, "error": { "message": "Validation failed", "details": [...] } }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="login" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-title">Login</span>
+        <span class="endpoint-path">/api/auth/login</span>
+      </div>
+      <div class="endpoint-body">
+        <p class="endpoint-desc">Authenticate with email and password. Returns a JWT token valid for 7 days. Copy the <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">token</code> value and use it as the Bearer token in all subsequent protected requests.</p>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'login')">Body</div>
+          <div class="tab" onclick="switchTab(this,'login-res')">Response</div>
+        </div>
+        <div class="tab-panel active" data-group="login">
+          <div class="code-label">Content-Type: application/json</div>
+          <pre>{
+  "email":    "alice.admin@unimaintain.edu",
+  "password": "Password123!"
+}</pre>
+        </div>
+        <div class="tab-panel" data-group="login-res">
+          <span class="response-chip r200">200 OK</span>
+          <pre>{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id":    "clz1abc123",
+    "name":  "Alice Admin",
+    "email": "alice.admin@unimaintain.edu",
+    "role":  "ADMIN"
+  }
+}</pre>
+          <span class="response-chip r401">401 Unauthorized</span>
+          <pre>{ "success": false, "error": { "message": "Invalid credentials", "details": null } }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="me" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">Get Current User</span>
+        <span class="endpoint-path">/api/auth/me</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt;</div>
+        <p class="endpoint-desc">Returns the profile of the currently authenticated user based on the JWT payload.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": {
+    "user": {
+      "id":        "clz1abc123",
+      "name":      "Alice Admin",
+      "email":     "alice.admin@unimaintain.edu",
+      "role":      "ADMIN",
+      "createdAt": "2026-06-20T09:00:00.000Z"
+    }
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section-group">
+    <div class="group-title">Categories <span>/api/categories</span></div>
+    <div id="categories" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">List All Categories</span>
+        <span class="endpoint-path">/api/categories</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt;</div>
+        <p class="endpoint-desc">Returns all maintenance categories ordered alphabetically. Used to populate the category dropdown on the new request form.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": [
+    { "id": "clz2aaa", "name": "Electrical",  "description": null },
+    { "id": "clz2bbb", "name": "Furniture",   "description": null },
+    { "id": "clz2ccc", "name": "HVAC",        "description": null },
+    { "id": "clz2ddd", "name": "Plumbing",    "description": null },
+    { "id": "clz2eee", "name": "Structural",  "description": null }
+  ]
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICE REQUESTS -->
+  <div class="section-group">
+    <div class="group-title">Service Requests <span>/api/requests</span></div>
+
+    <div id="list-requests" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">List Requests</span>
+        <span class="endpoint-path">/api/requests</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt; · Access is role-scoped: STUDENT/STAFF see own requests only; OFFICER sees assigned requests only; ADMIN sees all.</div>
+        <p class="endpoint-desc">List maintenance requests with optional filtering and pagination.</p>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'lr')">Query Params</div>
+          <div class="tab" onclick="switchTab(this,'lr-res')">Response</div>
+        </div>
+        <div class="tab-panel active" data-group="lr">
+          <table class="param-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>page</td><td>number</td><td><span class="optional">Optional</span></td><td>Page number, default 1</td></tr>
+              <tr><td>limit</td><td>number</td><td><span class="optional">Optional</span></td><td>Items per page, default 20, max 100</td></tr>
+              <tr><td>search</td><td>string</td><td><span class="optional">Optional</span></td><td>Keyword search on title and description</td></tr>
+              <tr><td>status</td><td>enum</td><td><span class="optional">Optional</span></td><td>PENDING | ASSIGNED | IN_PROGRESS | COMPLETED</td></tr>
+              <tr><td>categoryId</td><td>string</td><td><span class="optional">Optional</span></td><td>Filter by category CUID</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-panel" data-group="lr-res">
+          <span class="response-chip r200">200 OK</span>
+          <pre>{
+  "success": true,
+  "data": [
+    {
+      "id":          "clz3aaa",
+      "title":       "Broken ceiling fan in Lab 3",
+      "description": "The ceiling fan has stopped working",
+      "status":      "PENDING",
+      "priority":    "HIGH",
+      "location":    "Engineering Block, Lab 3",
+      "imageUrl":    null,
+      "category":    { "id": "clz2aaa", "name": "Electrical" },
+      "createdBy":   { "id": "clz1aaa", "name": "Sam Student" },
+      "assignedTo":  null,
+      "createdAt":   "2026-06-20T10:15:00.000Z"
+    }
+  ],
+  "pagination": { "page": 1, "limit": 20, "total": 1, "totalPages": 1 }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="create-request" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-title">Create Request</span>
+        <span class="endpoint-path">/api/requests</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt; · Roles: STUDENT, STAFF only</div>
+        <p class="endpoint-desc">Submit a new maintenance request. Send as <strong>multipart/form-data</strong> to support optional image upload. The image field accepts PNG, JPG, JPEG, and WEBP files.</p>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'cr')">Body (form-data)</div>
+          <div class="tab" onclick="switchTab(this,'cr-res')">Response</div>
+        </div>
+        <div class="tab-panel active" data-group="cr">
+          <table class="param-table">
+            <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>title</td><td>string</td><td><span class="required">Required</span></td><td>Short title of the fault</td></tr>
+              <tr><td>description</td><td>string</td><td><span class="required">Required</span></td><td>Detailed description of the issue</td></tr>
+              <tr><td>categoryId</td><td>string</td><td><span class="required">Required</span></td><td>CUID of the category (from GET /categories)</td></tr>
+              <tr><td>location</td><td>string</td><td><span class="required">Required</span></td><td>Where the fault is located</td></tr>
+              <tr><td>priority</td><td>enum</td><td><span class="optional">Optional</span></td><td>LOW | MEDIUM | HIGH (default: MEDIUM)</td></tr>
+              <tr><td>image</td><td>file</td><td><span class="optional">Optional</span></td><td>Photo of the fault (PNG/JPG/WEBP)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-panel" data-group="cr-res">
+          <span class="response-chip r201">201 Created</span>
+          <pre>{
+  "success": true,
+  "data": {
+    "id":          "clz3bbb",
+    "title":       "Broken ceiling fan in Lab 3",
+    "status":      "PENDING",
+    "priority":    "HIGH",
+    "location":    "Engineering Block, Lab 3",
+    "imageUrl":    "https://res.cloudinary.com/doacmv7bc/image/upload/...",
+    "createdAt":   "2026-06-28T14:00:00.000Z"
+  }
+}</pre>
+          <span class="response-chip r403">403 Forbidden</span>
+          <pre>{ "success": false, "error": { "message": "Insufficient permissions", "details": null } }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="get-request" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">Get Single Request</span>
+        <span class="endpoint-path">/api/requests/:id</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt;</div>
+        <p class="endpoint-desc">Get full details of a single request including category, creator, assignee, all status history logs, and assignment records.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": {
+    "id":          "clz3aaa",
+    "title":       "Broken ceiling fan in Lab 3",
+    "description": "The ceiling fan has stopped working",
+    "status":      "IN_PROGRESS",
+    "priority":    "HIGH",
+    "location":    "Engineering Block, Lab 3",
+    "imageUrl":    null,
+    "category":    { "id": "clz2aaa", "name": "Electrical" },
+    "createdBy":   { "id": "clz1aaa", "name": "Sam Student", "email": "sam@..." },
+    "assignedTo":  { "id": "clz1off", "name": "Olivia Officer" },
+    "statusLogs": [
+      {
+        "oldStatus": "PENDING",
+        "newStatus": "ASSIGNED",
+        "comment":   "Assigned to Olivia",
+        "changedBy": { "name": "Alice Admin" },
+        "changedAt": "2026-06-21T09:00:00.000Z"
+      },
+      {
+        "oldStatus": "ASSIGNED",
+        "newStatus": "IN_PROGRESS",
+        "comment":   "Officer attended site",
+        "changedBy": { "name": "Olivia Officer" },
+        "changedAt": "2026-06-21T14:00:00.000Z"
+      }
+    ],
+    "createdAt":  "2026-06-20T10:15:00.000Z",
+    "updatedAt":  "2026-06-21T14:00:00.000Z"
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div id="update-status" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge patch">PATCH</span>
+        <span class="endpoint-title">Update Request Status</span>
+        <span class="endpoint-path">/api/requests/:id</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt; · Roles: OFFICER (assigned requests only), ADMIN</div>
+        <p class="endpoint-desc">Update the status of a maintenance request. Creates a StatusLog entry recording the actor, old status, new status, and optional comment.</p>
+        <p class="endpoint-desc">Status flow: <strong>PENDING → ASSIGNED → IN_PROGRESS → COMPLETED</strong></p>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'us')">Body</div>
+          <div class="tab" onclick="switchTab(this,'us-res')">Response</div>
+        </div>
+        <div class="tab-panel active" data-group="us">
+          <div class="code-label">Content-Type: application/json</div>
+          <pre>{
+  "status":  "IN_PROGRESS",
+  "comment": "Officer attended site, repair in progress"
+}</pre>
+          <table class="param-table" style="margin-top:12px">
+            <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>status</td><td>enum</td><td><span class="required">Required</span></td><td>PENDING | ASSIGNED | IN_PROGRESS | COMPLETED</td></tr>
+              <tr><td>comment</td><td>string</td><td><span class="optional">Optional</span></td><td>Note recorded in the status log</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-panel" data-group="us-res">
+          <span class="response-chip r200">200 OK</span>
+          <pre>{
+  "success": true,
+  "data": {
+    "id":        "clz3aaa",
+    "status":    "IN_PROGRESS",
+    "updatedAt": "2026-06-21T14:00:00.000Z"
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="section-group">
+    <div class="group-title">Admin <span>/api/admin</span></div>
+
+    <div id="assign" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-title">Assign Officer to Request</span>
+        <span class="endpoint-path">/api/admin/requests/:id/assign</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt; · Role: ADMIN only</div>
+        <p class="endpoint-desc">Assign a maintenance officer to a request. Creates an Assignment record, sets the request status to ASSIGNED, and sends the officer an in-app notification.</p>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'as')">Body</div>
+          <div class="tab" onclick="switchTab(this,'as-res')">Response</div>
+        </div>
+        <div class="tab-panel active" data-group="as">
+          <div class="code-label">Content-Type: application/json</div>
+          <pre>{
+  "officerId": "clz1off001"
+}</pre>
+        </div>
+        <div class="tab-panel" data-group="as-res">
+          <span class="response-chip r200">200 OK</span>
+          <pre>{
+  "success": true,
+  "data": {
+    "id":          "clz3aaa",
+    "status":      "ASSIGNED",
+    "assignedTo":  { "id": "clz1off001", "name": "Olivia Officer" }
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="officers" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">List All Officers</span>
+        <span class="endpoint-path">/api/admin/officers</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt; · Role: ADMIN only</div>
+        <p class="endpoint-desc">Returns all users with the OFFICER role. Used to populate the officer assignment dropdown in the admin interface.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": [
+    {
+      "id":    "clz1off001",
+      "name":  "Olivia Officer",
+      "email": "olivia.officer@unimaintain.edu"
+    }
+  ]
+}</pre>
+      </div>
+    </div>
+
+    <div id="reports" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">Get Reports Summary</span>
+        <span class="endpoint-path">/api/admin/reports</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt; · Role: ADMIN only</div>
+        <p class="endpoint-desc">Returns a summary report for the admin dashboard: total requests, count by status, and count by category.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": {
+    "total": 12,
+    "byStatus": {
+      "PENDING":     4,
+      "ASSIGNED":    3,
+      "IN_PROGRESS": 3,
+      "COMPLETED":   2
+    },
+    "byCategory": [
+      { "category": "Electrical", "count": 5 },
+      { "category": "Plumbing",   "count": 4 },
+      { "category": "Furniture",  "count": 3 }
+    ]
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="section-group">
+    <div class="group-title">Notifications <span>/api/notifications</span></div>
+
+    <div id="notifications" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-title">List My Notifications</span>
+        <span class="endpoint-path">/api/notifications</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt;</div>
+        <p class="endpoint-desc">Returns all notifications for the currently authenticated user, newest first. Notifications are created on officer assignment and status updates.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": [
+    {
+      "id":        "clznot001",
+      "message":   "You have been assigned to request: Broken ceiling fan in Lab 3",
+      "read":      false,
+      "createdAt": "2026-06-21T09:00:00.000Z"
+    }
+  ]
+}</pre>
+      </div>
+    </div>
+
+    <div id="mark-read" class="endpoint">
+      <div class="endpoint-header">
+        <span class="method-badge patch">PATCH</span>
+        <span class="endpoint-title">Mark Notification as Read</span>
+        <span class="endpoint-path">/api/notifications/:id/read</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="auth-note">🔒 Requires Authorization: Bearer &lt;token&gt;</div>
+        <p class="endpoint-desc">Marks a single notification as read. Only the notification owner can mark their own notifications.</p>
+        <div class="code-label">Response 200</div>
+        <pre>{
+  "success": true,
+  "data": { "id": "clznot001", "read": true }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#9ca3af;font-size:12px;margin-top:32px;padding-top:20px;border-top:1px solid #e5e7eb">
+    UniMaintain API · Miva Open University · June 2026
+  </div>
+</div>
+
+<script>
+  function switchTab(el, group) {
+    const parent = el.closest('.endpoint-body');
+    parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    parent.querySelectorAll('.tab-panel').forEach(p => {
+      p.classList.toggle('active', p.dataset.group === group);
+    });
+  }
+
+  // Sidebar active link on scroll
+  const links = document.querySelectorAll('.sidebar-link[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`.sidebar-link[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('[id]').forEach(el => observer.observe(el));
+</script>

@@ -1,58 +1,300 @@
 {
   "info": {
     "name": "UniMaintain API",
+    "_postman_id": "unimaintain-api-v1",
+    "description": "Complete API collection for UniMaintain — a university maintenance request management system.\n\n**Base URL:** https://unimaintain.onrender.com\n\n**Auth:** After calling Login or Register, copy the `token` from the response and set it as the `jwt` collection variable.\n\n**Test Credentials:**\n- Admin: alice.admin@unimaintain.edu / Password123!\n- Officer: olivia.officer@unimaintain.edu / Password123!\n- Student: sam.student@unimaintain.edu / Password123!",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    { "key": "baseUrl", "value": "https://unimaintain.onrender.com", "type": "string" },
+    { "key": "jwt", "value": "", "type": "string", "description": "Paste the token returned from Login or Register here" }
+  ],
   "item": [
     {
       "name": "Auth",
+      "description": "Authentication endpoints — no JWT required",
       "item": [
         {
           "name": "Register",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{baseUrl}}/api/auth/register",
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}" }
-          }
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sam Student\",\n  \"email\": \"sam@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Register a new user. New users default to the STUDENT role. Returns a JWT token and user object."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": \"clz1abc123\",\n    \"name\": \"Sam Student\",\n    \"email\": \"sam@example.com\",\n    \"role\": \"STUDENT\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Login",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{baseUrl}}/api/auth/login",
-            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}" }
-          }
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice.admin@unimaintain.edu\",\n  \"password\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Login with email and password. Returns a JWT token. Copy the token value into the `jwt` collection variable."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": \"clz1abc123\",\n    \"name\": \"Alice Admin\",\n    \"email\": \"alice.admin@unimaintain.edu\",\n    \"role\": \"ADMIN\"\n  }\n}"
+            },
+            {
+              "name": "401 Wrong Password",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"success\": false,\n  \"error\": { \"message\": \"Invalid credentials\", \"details\": null }\n}"
+            }
+          ]
         },
         {
-          "name": "Me",
+          "name": "Get Current User (Me)",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
-            "url": "{{baseUrl}}/api/auth/me"
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api","auth","me"] },
+            "description": "Returns the profile of the currently authenticated user based on the JWT."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"clz1abc123\",\n      \"name\": \"Alice Admin\",\n      \"email\": \"alice.admin@unimaintain.edu\",\n      \"role\": \"ADMIN\",\n      \"createdAt\": \"2026-06-20T09:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "description": "Maintenance request categories — requires JWT",
+      "item": [
+        {
+          "name": "List All Categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/categories", "host": ["{{baseUrl}}"], "path": ["api","categories"] },
+            "description": "Returns all maintenance categories ordered alphabetically. Used to populate the category dropdown on the request form."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    { \"id\": \"clz2aaa\", \"name\": \"Electrical\", \"description\": null },\n    { \"id\": \"clz2bbb\", \"name\": \"Furniture\", \"description\": null },\n    { \"id\": \"clz2ccc\", \"name\": \"Plumbing\", \"description\": null }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Service Requests",
+      "description": "Endpoints for submitting, listing, and managing maintenance requests — requires JWT",
+      "item": [
+        {
+          "name": "List Requests",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/requests?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","requests"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "status", "value": "PENDING", "disabled": true },
+                { "key": "categoryId", "value": "", "disabled": true }
+              ]
+            },
+            "description": "List maintenance requests. Access is role-scoped:\n- STUDENT/STAFF: see only their own requests\n- OFFICER: see only requests assigned to them\n- ADMIN: see all requests\n\nSupports filtering by status (PENDING/ASSIGNED/IN_PROGRESS/COMPLETED), categoryId, and keyword search."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"clz3aaa\",\n      \"title\": \"Broken ceiling fan in Lab 3\",\n      \"status\": \"PENDING\",\n      \"priority\": \"HIGH\",\n      \"location\": \"Engineering Block, Lab 3\",\n      \"category\": { \"id\": \"clz2aaa\", \"name\": \"Electrical\" },\n      \"createdBy\": { \"id\": \"clz1aaa\", \"name\": \"Sam Student\" },\n      \"createdAt\": \"2026-06-20T10:15:00.000Z\"\n    }\n  ],\n  \"pagination\": { \"page\": 1, \"limit\": 20, \"total\": 1, \"totalPages\": 1 }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Request",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/requests", "host": ["{{baseUrl}}"], "path": ["api","requests"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Broken ceiling fan in Lab 3", "type": "text" },
+                { "key": "description", "value": "The ceiling fan in Laboratory 3 has stopped working. Students cannot concentrate due to heat.", "type": "text" },
+                { "key": "categoryId", "value": "PASTE_CATEGORY_ID_HERE", "type": "text" },
+                { "key": "priority", "value": "HIGH", "type": "text" },
+                { "key": "location", "value": "Engineering Block, Lab 3", "type": "text" },
+                { "key": "image", "value": "", "type": "file", "disabled": true }
+              ]
+            },
+            "description": "Submit a new maintenance request. Accepts multipart/form-data to support optional image upload.\n\nAllowed roles: STUDENT, STAFF\n\npriority must be one of: LOW, MEDIUM, HIGH (defaults to MEDIUM)"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"clz3bbb\",\n    \"title\": \"Broken ceiling fan in Lab 3\",\n    \"status\": \"PENDING\",\n    \"priority\": \"HIGH\",\n    \"location\": \"Engineering Block, Lab 3\",\n    \"imageUrl\": null,\n    \"createdAt\": \"2026-06-28T14:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Request",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/requests/:id", "host": ["{{baseUrl}}"], "path": ["api","requests",":id"], "variable": [{ "key": "id", "value": "PASTE_REQUEST_ID_HERE" }] },
+            "description": "Get full details of a single request including category, creator, assignee, all status logs, and assignments."
+          }
+        },
+        {
+          "name": "Update Request Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/requests/:id", "host": ["{{baseUrl}}"], "path": ["api","requests",":id"], "variable": [{ "key": "id", "value": "PASTE_REQUEST_ID_HERE" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"comment\": \"Officer attended site, repair in progress\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Update the status of a maintenance request. Creates a StatusLog entry recording who changed the status, from what, to what, and when.\n\nAllowed roles: OFFICER (assigned only), ADMIN\n\nStatus values: PENDING → ASSIGNED → IN_PROGRESS → COMPLETED"
           }
         }
       ]
     },
     {
-      "name": "Requests",
+      "name": "Admin",
+      "description": "Admin-only endpoints — requires JWT with ADMIN role",
       "item": [
-        { "name": "List Requests", "request": { "method": "GET", "url": "{{baseUrl}}/api/requests" } },
-        { "name": "Create Request", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/requests" } },
-        { "name": "Get Request", "request": { "method": "GET", "url": "{{baseUrl}}/api/requests/:id" } },
-        { "name": "Update Request", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/requests/:id" } },
-        { "name": "Delete Request", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/requests/:id" } }
+        {
+          "name": "Assign Officer to Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/admin/requests/:id/assign", "host": ["{{baseUrl}}"], "path": ["api","admin","requests",":id","assign"], "variable": [{ "key": "id", "value": "PASTE_REQUEST_ID_HERE" }] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"officerId\": \"PASTE_OFFICER_USER_ID_HERE\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Assign a maintenance officer to a request. Creates an Assignment record and sends a notification to the officer. Sets request status to ASSIGNED."
+          }
+        },
+        {
+          "name": "Get All Officers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/officers", "host": ["{{baseUrl}}"], "path": ["api","admin","officers"] },
+            "description": "Returns all users with the OFFICER role. Used to populate the officer assignment dropdown in the admin UI."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    { \"id\": \"clz1off001\", \"name\": \"Olivia Officer\", \"email\": \"olivia.officer@unimaintain.edu\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Reports Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/reports", "host": ["{{baseUrl}}"], "path": ["api","admin","reports"] },
+            "description": "Returns a summary report for the admin dashboard: total requests, count by each status, and count by category."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"total\": 12,\n    \"byStatus\": {\n      \"PENDING\": 4,\n      \"ASSIGNED\": 3,\n      \"IN_PROGRESS\": 3,\n      \"COMPLETED\": 2\n    },\n    \"byCategory\": [\n      { \"category\": \"Electrical\", \"count\": 5 },\n      { \"category\": \"Plumbing\", \"count\": 4 },\n      { \"category\": \"Furniture\", \"count\": 3 }\n    ]\n  }\n}"
+            }
+          ]
+        }
       ]
     },
     {
-      "name": "Admin",
+      "name": "Notifications",
+      "description": "In-app notifications — requires JWT",
       "item": [
-        { "name": "List Users", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/admin/users" } },
-        { "name": "Update User Role", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/admin/users/:id" } },
-        { "name": "Assign Officer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }], "url": "{{baseUrl}}/api/admin/requests/:id/assign" } }
+        {
+          "name": "List My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications", "host": ["{{baseUrl}}"], "path": ["api","notifications"] },
+            "description": "Returns all notifications for the currently logged-in user, newest first."
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications/:id/read", "host": ["{{baseUrl}}"], "path": ["api","notifications",":id","read"], "variable": [{ "key": "id", "value": "PASTE_NOTIFICATION_ID_HERE" }] },
+            "description": "Marks a single notification as read. Only the notification owner can mark it."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api","health"] },
+            "description": "Check if the backend server is running. No auth required."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": { \"status\": \"ok\", \"service\": \"unimaintain-backend\" }\n}"
+            }
+          ]
+        }
       ]
     }
-  ],
-  "event": []
+  ]
 }
